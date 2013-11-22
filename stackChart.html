@@ -1,0 +1,46 @@
+<html>
+    <head>
+        <title>Stack Chart using D3 JS</title>
+        <script src="http://mbostock.github.com/d3/d3.v2.js"></script>
+    </head>
+    <body>
+        <script>
+          var data = [[ 1,  4,  2,  3],
+                     [1,  2,  4, 1]];
+
+          //map data to array of x,y,y0 co-ordinates
+          data = data.map(function(d) { return d.map(function(p, i) { return {x:i, y:p, y0:0};}); });
+          console.log(data);
+
+          //represent each object with a different color
+          var colors = d3.scale.category10();
+
+          //x and y co-ordinate creation
+          var x = d3.scale.linear().range([0, 800]).domain([0,3]);
+          var y = d3.scale.linear().range([500, 0]).domain([0,25]);
+
+          //create svg tag
+          var svg = d3.select("body").append("svg")
+             .attr("width", 800)
+             .attr("height", 500);
+
+          //Invoking a stacked layout
+          var stack = d3.layout.stack();  
+          var layers = stack(data);
+
+          //Define the svg area for data provided
+          var area = d3.svg.area()
+             .interpolate('cardinal')
+             .x(function(d, i) { return x(i); })
+             .y0(function(d) { return y(d.y0); })
+             .y1(function(d) { return y(d.y0 + d.y); });
+
+          //draw path of the input data inside the svg tag
+          svg.selectAll("body")
+               .data(layers)
+               .enter().append("path")
+               .attr("d", function(d) { return area(d); })
+               .style("fill", function(d, i) { return colors(i); });
+        </script>
+    </body>
+</html>
